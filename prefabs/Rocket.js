@@ -3,24 +3,40 @@ class Rocket extends Phaser.GameObjects.Sprite{
         super(scene, x, y, texture, frame);
 
         scene.add.existing(this);
+        this.multi = game.settings.multiplay;
         this.isFiring = false;
         this.sfxRocket = scene.sound.add('sfx_rocket'); //add rocket sfx
+        if(this.multi == 0){
+            //if 0 give P1 controls
+            this.moveLeft = keyLEFT;
+            this.moveRight = keyRIGHT;
+            this.fire = keyF;
+        }
+        else{
+            //if 1 (or anything else) give P2 controls
+            this.moveLeft = keyN;
+            this.moveRight = keyM;
+            this.fire = keyS;
+        }
     }
 
     update(){
         //left/right movement
         if(!this.isFiring){
-            if(keyLEFT.isDown && this.x >= 47){
+            if(this.moveLeft.isDown && this.x >= 47){
                 this.x -= 2;
-            }else if (keyRIGHT.isDown && this.x <= 578){
+            }else if (this.moveRight.isDown && this.x <= 578){
                 this.x +=  2;
             }
         }
 
         //fire button
-        if(Phaser.Input.Keyboard.JustDown(keyF)){
+        if(Phaser.Input.Keyboard.JustDown(this.fire)){
+            if(!this.isFiring){
+                this.sfxRocket.play();
+            }
             this.isFiring = true;
-            this.sfxRocket.play();
+
         }
         
         //if fired, move up
