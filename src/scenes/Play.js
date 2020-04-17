@@ -84,11 +84,11 @@ class Play extends Phaser.Scene {
             this.scoreConfig.backgroundColor = '#FF4466';
             this.scoreConfig.color = '#FFF';
             this.scoreConfig.align = 'left';
-            this.scoreLeft = this.add.text(69, 54, this.p1Score, scoreConfig);
+            this.scoreLeft = this.add.text(69, 54, this.p1Score, this.scoreConfig);
             this.scoreConfig.backgroundColor = '#3DBAFF';
             this.scoreConfig.color = '#FFF';
             this.scoreConfig.align = 'right';
-            this.scoreRight = this.add.text(471, 54, this.p2Score, scoreConfig);
+            this.scoreRight = this.add.text(471, 54, this.p2Score, this.scoreConfig);
             this.scoreConfig.backgroundColor = '#F3B141';
             this.scoreConfig.color = '#843605';
         }
@@ -99,21 +99,30 @@ class Play extends Phaser.Scene {
         this.clock = this.time.delayedCall(30000, ()=> {
             game.settings.spaceshipSpeed += 1.5;
         }, null, this);
-        //60-second play clock
-        this.gameEnd = this.time.now + game.settings.gameTimer;
-        this.scoreConfig.fixedWidth = 0;
+        //45/60-second play clock
+        this.timeOffset = this.time.now;
+        //a literal timer
+        this.scoreConfig.align = 'center';
+        this.timeUI = this.add.text(270, 54, '0', this.scoreConfig);
+        this.scoreConfig.align = 'right';
     }
 
 
     update(){
         this.starfield.tilePositionX -= 4;
         //check if the game's over
-        if(this.time.now >= this.gameEnd && this.gameOver == false){
+        if(this.time.now - this.timeOffset >= game.settings.gameTimer && this.gameOver == false){
+            this.timeUI.text = '0.0000';
+            this.scoreConfig.fixedWidth = 0;
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', 
             this.scoreConfig).setOrigin(0.5);
             this.add.text(game.config.width/2, game.config.height/2 + 64, '(F)ire to Restart or ← for Menu',
             this.scoreConfig).setOrigin(0.5);
             this.gameOver = true;
+        }
+        //update in-game timer
+        if(!this.gameOver){
+            this.timeUI.text = (game.settings.gameTimer - (this.time.now - this.timeOffset)) / 1000;
         }
         //check key input for restart
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyF)){
