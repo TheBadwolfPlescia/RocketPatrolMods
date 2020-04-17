@@ -95,7 +95,7 @@ class Play extends Phaser.Scene {
         //gamer over flag
         this.gameOver = false;
         
-        //60-second pay clock
+        //60-second play clock
         scoreConfig.fixedWidth = 0;
         this.clock = this.time.delayedCall(game.settings.gameTimer, ()=> {
             this.add.text(game.config.width/2, game.config.height/2, 'GAME OVER', 
@@ -104,13 +104,19 @@ class Play extends Phaser.Scene {
             scoreConfig).setOrigin(0.5);
             this.gameOver = true;
         }, null, this);
+        //30-second speedup clock...?
+        this.clock = this.time.delayedCall(30000, ()=> {
+            game.settings.spaceshipSpeed += 1.5;
+        }, null, this);
     }
 
 
     update(){
+        //console.log(this.clock);
         this.starfield.tilePositionX -= 4;
         //check key input for restart
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyF)){
+            game.settings.spaceshipSpeed -= 1.5;
             this.scene.restart(this.p1Score);
         }
         if(this.gameOver && Phaser.Input.Keyboard.JustDown(keyLEFT)){
